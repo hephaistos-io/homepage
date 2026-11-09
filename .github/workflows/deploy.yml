@@ -27,8 +27,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
         env:
-          # "/" for a custom domain (hephaistos.io) or <org>.github.io.
-          # Use "/homepage/" if served from hephaistos-io.github.io/homepage.
+          # Served at the root of the custom domain hephaistos.io (public/CNAME).
           BASE_PATH: /
       - uses: actions/upload-pages-artifact@v3
         with:

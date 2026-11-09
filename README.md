@@ -23,11 +23,14 @@ catch-all route.
 Routes with params (e.g. `/projects/:slug`) are not prerendered automatically;
 list their URLs via `prerender: async () => [...]` in `react-router.config.ts`.
 
-`BASE_PATH` (default `/`) sets the URL prefix. Use `/homepage/` if the site is
-served from `hephaistos-io.github.io/homepage` instead of a custom domain.
+Custom domain: `public/CNAME` (hephaistos.io), so the site lives at `/`.
+`BASE_PATH` only needs changing if that ever moves to a sub-path.
 
 Deploy: `.github/workflows/deploy.yml` builds on push to `main`. In repo
-Settings → Pages, set Source to "GitHub Actions".
+Settings → Pages, set Source to "GitHub Actions" and the custom domain to
+hephaistos.io. DNS: `A` records for the apex to GitHub Pages' IPs
+(185.199.108.153, .109.153, .110.153, .111.153), optionally `www` CNAME to
+`hephaistos-io.github.io`.
 
 ## Wordmark
 
