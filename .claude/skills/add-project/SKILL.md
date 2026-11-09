@@ -41,7 +41,7 @@ Leave out what you don't have; empty fields are not shown. Only `name` and `desc
 ## 3. Images (`images/`)
 
 - Order = filename, natural sort: `1_overview.png`, `2_widgets.png`, … `10_…` comes after `9_…`.
-- Any size or shape, mixed freely. The page shows them in a sideways-scrolling strip, all at the same height and each at its own width: phone screenshots sit side by side, landscape shots take most of the width. Nothing is cropped (thumbnails are square crops).
+- Any size or shape, mixed freely. One image is shown large at a time (whole, never cropped), with a row of thumbnails below to switch. The large frame takes the shape of the project's tallest image, capped to the screen height.
 - Export at most ~2400px on the long edge, as WebP or JPEG (PNG for flat graphics). Files ship as-is: nothing resizes them.
 - No `images/` folder: the page shows only the title block.
 
