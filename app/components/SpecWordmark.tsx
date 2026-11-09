@@ -16,48 +16,20 @@ import { wordmark as w } from './wordmark-data'
 const pctX = (x: number) => ((x - w.minX) / w.width) * 100
 const pctY = (y: number) => ((y - w.minY) / w.height) * 100
 
-// Optional dashed ring hugging the dot; it must clear the top of the ı stem.
-const dotToStem = -w.dot.cy - w.xHeight // distance from dot centre down to the stem top
-const ringR = Math.min(w.dot.r * 1.35, dotToStem - 20)
-
-// Leader runs up-right at 45° from the edge of the dot (or of the ring), then horizontal.
-function leaderFrom(r: number) {
-  const d = r * Math.SQRT1_2
-  const start = { x: w.dot.cx + d, y: w.dot.cy - d }
-  const elbow = { x: start.x + 360, y: start.y - 360 }
-  const end = { x: elbow.x + 520, y: elbow.y }
-  return { points: `${start.x},${start.y} ${elbow.x},${elbow.y} ${end.x},${end.y}`, end }
-}
+// Leader runs up-right at 45° from the edge of the dot, then horizontal to the label.
+const start = { x: w.dot.cx + w.dot.r * Math.SQRT1_2, y: w.dot.cy - w.dot.r * Math.SQRT1_2 }
+const elbow = { x: start.x + 360, y: start.y - 360 }
+const leaderEnd = { x: elbow.x + 520, y: elbow.y }
+const leaderPoints = `${start.x},${start.y} ${elbow.x},${elbow.y} ${leaderEnd.x},${leaderEnd.y}`
 
 const vars = (v: Record<string, string>) => v as CSSProperties
 
-type Props = {
-  /** "touch": leader starts on the dot itself. "ring": dashed ring around the dot. */
-  marker?: 'touch' | 'ring'
-}
-
-export default function SpecWordmark({ marker = 'touch' }: Props) {
-  const leader = leaderFrom(marker === 'ring' ? ringR : w.dot.r)
+export default function SpecWordmark() {
   return (
     <div className="spec">
       <Wordmark block>
-        {marker === 'ring' && (
-          <circle
-            cx={w.dot.cx}
-            cy={w.dot.cy}
-            r={ringR}
-            fill="none"
-            stroke="currentColor"
-            // In font units: ~1px at the largest hero size, scaling down with it.
-            // (Dashes on non-scaling strokes render unreliably, so this one scales.)
-            strokeWidth={10}
-            // pathLength makes the dash count independent of size: 24 dashes, 24 gaps.
-            pathLength={48}
-            strokeDasharray="1 1"
-          />
-        )}
         <polyline
-          points={leader.points}
+          points={leaderPoints}
           fill="none"
           stroke="currentColor"
           strokeWidth={1}
@@ -73,7 +45,7 @@ export default function SpecWordmark({ marker = 'touch' }: Props) {
       </span>
       <span
         className="spec-fig"
-        style={vars({ '--x': `${pctX(leader.end.x)}%`, '--y': `${pctY(leader.end.y)}%` })}
+        style={vars({ '--x': `${pctX(leaderEnd.x)}%`, '--y': `${pctY(leaderEnd.y)}%` })}
         aria-hidden="true"
       >
         fig. 1<span className="spec-fig-long"> — the spark</span>
