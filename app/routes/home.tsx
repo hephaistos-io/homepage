@@ -22,8 +22,8 @@ export default function Home() {
         <div className="works-intro">
           <figure className="quote">
             <span className="mono">fig. 1</span>
-            <blockquote>“…your own flower, the flashing fire, source of all arts.”</blockquote>
-            <figcaption className="mono muted">Aeschylus, Prometheus Bound 7 — said to Hephaistos</figcaption>
+            <blockquote>“…your own flower, flashing fire, source of all arts…”</blockquote>
+            <figcaption className="mono muted">Aeschylus, Prometheus Bound 7 — said to Hephaistos (tr. H. W. Smyth)</figcaption>
           </figure>
           <p className="motto">Building whatever the spark leads me to.</p>
         </div>
