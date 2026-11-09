@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+<defs><pattern id="h" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="28" stroke="#161616" stroke-opacity="0.12" stroke-width="2"/></pattern></defs>
+<rect width="900" height="900" fill="#e3e2dd"/><rect width="900" height="900" fill="url(#h)"/>
+<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="50" fill="#161616">[placeholder · 1:1]</text>
+</svg>

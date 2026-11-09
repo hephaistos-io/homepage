@@ -1,11 +1,41 @@
-import type { Project } from '../components/ProjectItem'
+import { folderToSlug, naturalCompare } from './slug'
+import type { Project, ProjectImage, ProjectMeta } from './types'
 
-// Every `app/projects/*.ts` file (except this one) that default-exports a
-// Project becomes a row on the home page. Order = filename sort, so prefix
-// files with a number (`01-foo.ts`, `02-bar.ts`). The glob is eager, so it is
-// resolved at build time and the list is in the prerendered HTML.
-const modules = import.meta.glob<{ default: Project }>(['./*.ts', '!./index.ts'], { eager: true })
+// One folder per project:
+//   app/projects/<nn>-<slug>/project.tsx   default-exports a ProjectMeta
+//   app/projects/<nn>-<slug>/images/*      optional; shown in filename order
+// Both globs are eager, so everything is resolved at build time and ends up
+// in the prerendered HTML. Image imports give hashed URLs under /assets.
+const metas = import.meta.glob<ProjectMeta>('./*/project.tsx', { eager: true, import: 'default' })
+const imageUrls = import.meta.glob<string>('./*/images/*.{png,jpg,jpeg,webp,avif,gif,svg}', {
+  eager: true,
+  import: 'default',
+})
 
-export const projects: Project[] = Object.keys(modules)
-  .sort()
-  .map((path) => modules[path].default)
+const folderOf = (path: string) => path.split('/')[1]
+const fileOf = (path: string) => path.split('/').pop()!
+
+const imagesByFolder = new Map<string, ProjectImage[]>()
+for (const path of Object.keys(imageUrls).sort((a, b) => naturalCompare(fileOf(a), fileOf(b)))) {
+  const list = imagesByFolder.get(folderOf(path)) ?? []
+  list.push({ src: imageUrls[path], file: fileOf(path) })
+  imagesByFolder.set(folderOf(path), list)
+}
+
+export const projects: Project[] = Object.keys(metas)
+  .map(folderOf)
+  .sort(naturalCompare)
+  .map((folder, i) => ({
+    ...metas[`./${folder}/project.tsx`],
+    slug: folderToSlug(folder),
+    fig: i + 2,
+    images: imagesByFolder.get(folder) ?? [],
+  }))
+
+const bySlug = new Map<string, Project>()
+for (const p of projects) {
+  if (bySlug.has(p.slug)) throw new Error(`Two project folders map to the slug "${p.slug}"`)
+  bySlug.set(p.slug, p)
+}
+
+export const getProject = (slug: string | undefined) => (slug ? bySlug.get(slug) : undefined)

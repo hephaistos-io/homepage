@@ -23,9 +23,8 @@ export default function Home() {
           <p className="motto">Building whatever the spark leads me to.</p>
         </div>
         <ol className="works-list">
-          {/* fig. 1 is the quote, so projects start at fig. 2. */}
-          {projects.map((p, i) => (
-            <ProjectItem key={p.name} fig={i + 2} project={p} />
+          {projects.map((p) => (
+            <ProjectItem key={p.slug} project={p} />
           ))}
         </ol>
       </section>

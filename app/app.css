@@ -71,22 +71,71 @@ a { color: inherit; }
 .quote blockquote { margin: 0; font-size: 20px; line-height: 1.45; font-weight: 500; }
 .motto { margin: 0; font-size: 16px; line-height: 1.6; font-weight: 500; }
 .works-list { flex: 2 1 480px; min-width: 0; margin: 0; padding: 0; list-style: none; border-left: 1px solid var(--line); }
-.works-list li {
-  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
-  padding: 20px 0 20px 32px; border-bottom: 1px solid var(--line);
-}
+.works-list li { border-bottom: 1px solid var(--line); }
 .works-list li:last-child { border-bottom: 0; }
+.works-row {
+  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
+  padding: 20px 0 20px 32px; color: inherit; text-decoration: none;
+}
+.works-row:hover .works-name { text-decoration: underline; }
 .works-fig { width: 56px; }
 .works-name { flex: 1 1 160px; font-size: 20px; font-weight: 700; }
 .works-desc { flex: 2 1 200px; font-size: 15px; color: var(--muted); }
-.works-name a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
-.works-name a:hover { text-decoration: underline; }
 /* The two columns stop fitting side by side below ~900px: stack them. */
 @media (max-width: 900px) {
   .works-intro { padding-right: 0; }
   .works-list { border-left: 0; border-top: 1px solid var(--line); }
-  .works-list li { padding-left: 0; }
+  .works-row { padding-left: 0; }
 }
+
+/* Project page: gallery left, title block right; fills the screen height. */
+.project { flex: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
+.project-back { padding: 24px 0; text-decoration: none; align-self: flex-start; }
+.project-back:hover { color: var(--ink); }
+.project-grid { flex: 1; display: flex; flex-wrap: wrap; gap: 32px; align-items: stretch; }
+.project-media { flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; }
+.project-aside { flex: 2 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+/* Once the columns stack (560 + 340 + 32 gap + 2×40 padding = 1012px), don't
+   stretch the stacked rows to fill the screen; the fill is a desktop thing. */
+@media (max-width: 1011px) { .project-grid { align-content: flex-start; } }
+
+.gallery { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.stage { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+/* The image is absolutely positioned so a tall image can't stretch the 16:9 frame. */
+.stage-frame { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--line); background: color-mix(in oklab, var(--ink) 4%, var(--paper)); }
+.stage-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.stage-caption { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; }
+.stage-nav { display: flex; align-items: center; gap: 8px; }
+.stage-nav .muted { margin-right: 8px; }
+.strip-btn {
+  width: 44px; height: 44px; border: 1px solid var(--line); background: none; color: inherit;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.strip-btn:disabled { opacity: 0.3; cursor: default; }
+/* The ::before reserves exactly one row; the grid is absolutely positioned so
+   its content never drives the height the row count is measured from. */
+.thumbs { --cols: 5; --gap: 8px; flex: 1; min-width: 0; position: relative; }
+.thumbs::before { content: ''; display: block; width: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); aspect-ratio: 1; }
+.thumbs-grid { position: absolute; inset: 0 0 auto 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--gap); }
+@media (max-width: 600px) { .thumbs { --cols: 4; } }
+.thumb { position: relative; padding: 0; aspect-ratio: 1; border: 1px solid var(--line); background: none; cursor: pointer; overflow: hidden; }
+.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.thumb[aria-pressed='true'] { outline: 2px solid var(--accent); outline-offset: -2px; }
+.thumb-label { position: absolute; left: 0; bottom: 0; padding: 2px 5px; font-size: 11px; background: var(--paper); color: var(--ink); }
+
+.titleblock { border: 1px solid var(--line); font-size: 14px; }
+.titleblock-head { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+.titleblock-head h1 { margin: 0; font-size: 32px; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+.titleblock-rows { margin: 0; }
+.titleblock-rows > div { display: grid; grid-template-columns: 88px 1fr; border-top: 1px solid var(--line); }
+.titleblock-rows dt { padding: 10px 16px; border-right: 1px solid var(--line); }
+.titleblock-rows dd { margin: 0; padding: 10px 16px; }
+.titleblock-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.titleblock-links a { display: inline-flex; align-items: center; gap: 2px; }
+.project-lede { margin: 0; font-size: 18px; line-height: 1.45; font-weight: 500; }
+.project-body { font-size: 15px; line-height: 1.6; }
+.project-body > * { margin: 0 0 1em; }
+.project-body > :last-child { margin-bottom: 0; }
 
 .page { padding: 64px 0; }
 .page h2 { font-size: 2rem; margin: 0 0 16px; }

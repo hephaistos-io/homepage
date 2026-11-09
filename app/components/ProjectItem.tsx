@@ -1,28 +1,15 @@
-import { ArrowUpRight } from 'lucide-react'
+import { Link } from 'react-router'
+import type { Project } from '../projects/types'
 
-export type Project = {
-  name: string
-  description: string
-  /** Optional link; opens in a new tab. */
-  href?: string
-}
-
-/** Template for one row in the works list. `fig` is assigned by position. */
-export default function ProjectItem({ fig, project }: { fig: number; project: Project }) {
-  const { name, description, href } = project
+/** One row in the home-page works list; links to the project's page. */
+export default function ProjectItem({ project }: { project: Project }) {
   return (
     <li>
-      <span className="mono works-fig">fig. {fig}</span>
-      <span className="works-name">
-        {href ? (
-          <a href={href} target="_blank" rel="noreferrer">
-            {name} <ArrowUpRight size={16} />
-          </a>
-        ) : (
-          name
-        )}
-      </span>
-      <span className="works-desc">{description}</span>
+      <Link to={`/projects/${project.slug}`} className="works-row">
+        <span className="mono works-fig">fig. {project.fig}</span>
+        <span className="works-name">{project.name}</span>
+        <span className="works-desc">{project.description}</span>
+      </Link>
     </li>
   )
 }
