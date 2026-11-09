@@ -1,4 +1,18 @@
+import { useEffect, useState } from 'react'
 import type { Route } from './+types/contact'
+
+// The address never appears whole in the prerendered HTML: scrapers reading
+// the HTML see "admin [at] hephaistos.io"; in the browser it is assembled
+// after hydration into a working mailto link.
+const USER = 'admin'
+const DOMAIN = 'hephaistos.io'
+
+function Email() {
+  const [address, setAddress] = useState<string | null>(null)
+  useEffect(() => setAddress(`${USER}@${DOMAIN}`), [])
+  if (!address) return <span>{`${USER} [at] ${DOMAIN}`}</span>
+  return <a href={`mailto:${address}`}>{address}</a>
+}
 
 // Deliberately unlinked: reachable only by its URL (/contact), e.g. from an
 // app-store listing. noindex keeps it out of search results. It is still a
@@ -14,7 +28,7 @@ export default function Contact() {
       <div className="prose">
         <h1>Contact</h1>
         <p>
-          <a href="mailto:admin@hephaistos.io">admin@hephaistos.io</a>
+          <Email />
         </p>
         <address className="contact-address">
           Ricardo Simoes
