@@ -12,8 +12,10 @@ const imageUrls = import.meta.glob<string>('./*/images/*.{png,jpg,jpeg,webp,avif
   eager: true,
   import: 'default',
 })
-// Not eager: only the file list is needed here. The privacy route loads the content.
-const privacyFiles = import.meta.glob('./*/privacy.mdx')
+// Only the file list is needed here; the privacy route loads the content.
+// `?raw` + lazy keeps this from touching the compiled MDX modules (no chunk
+// conflict with the route's eager import), and nothing here is ever called.
+const privacyFiles = import.meta.glob('./*/privacy.mdx', { query: '?raw', import: 'default' })
 
 const folderOf = (path: string) => path.split('/')[1]
 const fileOf = (path: string) => path.split('/').pop()!
