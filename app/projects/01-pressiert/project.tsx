@@ -15,14 +15,14 @@ export default {
 
   // One sentence. Shown next to the name on the home list and under the
   // title block on the project page.
-  description: 'Departures for Swiss public transport on iPhone, widgets and Apple Watch.',
+  description: 'Stylized app for Swiss public transport',
 
   // Row "year" in the title block. Free text: a single year or a range.
-  // year: '2026',
+  year: '2026',
 
   // Row "status" in the title block. Free text, e.g. 'Live', 'In development',
   // 'Beta', 'Retired'.
-  // status: 'Live on the App Store',
+  status: 'Beta',
 
   // Row "stack" in the title block: what it is built with. Free text.
   // stack: 'SwiftUI, WidgetKit, watchOS',
@@ -36,10 +36,12 @@ export default {
 
   // Longer write-up, shown under the description on the project page. Write
   // it as paragraphs: <p>…</p>, one per paragraph, inside <> … </>.
-  // body: (
-  //   <>
-  //     <p>Why it exists: the problem it solves, in two or three sentences.</p>
-  //     <p>What's interesting about it: a design decision, a technical detail.</p>
-  //   </>
-  // ),
+  body: (
+    <>
+      <p>I was very unhappy with existing 3rd party apps, as they offered no real good user interface or good looking widgets.</p>
+      <p>What's interesting about it: Adaptive data fetching using configurable commute times, to make more efficient usage of the battery capacity but also the daily widget update limit of iOS.</p>
+      <p>Contains stylized widgets with familiar colours and fonts that remind users of their local public transport.</p>
+      <p>Includes widgets that work on Apple Watch as well.</p>
+    </>
+  ),
 } satisfies ProjectMeta
