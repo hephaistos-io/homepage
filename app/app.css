@@ -38,20 +38,53 @@ a { color: inherit; }
 
 .main { flex: 1; display: flex; flex-direction: column; }
 
-.hero { padding: 120px 0 72px; }
-/* The wordmark scales with font-size (its width is ~5.07em). */
-.hero-title { margin: 0; font-size: clamp(56px, 18vw, 210px); line-height: 1; font-weight: 800; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; font-weight: 400; }
+.muted { color: var(--muted); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); border-top: 1px solid var(--line); }
-.cell { padding: 24px 24px 40px; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--line); }
-.cell:first-child { border-left: 0; padding-left: 0; }
-@media (max-width: 600px) {
-  .cell { border-left: 0; padding: 24px 0; border-bottom: 1px solid var(--line); }
-  .cell:last-child { border-bottom: 0; }
+/* Hero: the wordmark as a technical figure. Top padding leaves room for the leader label. */
+.hero { padding: 150px 0 72px; }
+.hero-title { margin: 0; font-size: clamp(56px, 18vw, 210px); line-height: 1; }
+
+.spec { position: relative; display: inline-block; color: var(--ink); }
+.spec-guide {
+  position: absolute; left: -3%; right: -3%; top: var(--y);
+  border-top: 1px dashed color-mix(in oklab, var(--ink) 45%, transparent);
 }
-.cell-index { font-size: 12px; font-weight: 500; color: var(--muted); }
-.cell-name { margin: 0; font-size: 20px; font-weight: 700; }
-.cell-desc { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+.spec-label, .spec-fig {
+  position: absolute; white-space: nowrap;
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 400; line-height: 1;
+}
+.spec-label { right: 0; }
+.spec-label--above { bottom: 4px; }
+.spec-label--below { top: 4px; }
+.spec-fig { left: var(--x); top: var(--y); font-size: 12px; transform: translate(8px, -50%); }
+@media (max-width: 600px) {
+  .spec-guide { left: 0; right: 0; }
+  .spec-label { display: none; }
+  .spec-fig-long { display: none; }
+}
+
+/* Below the hero: quote + motto on the left, numbered works on the right. */
+.works { display: flex; flex-wrap: wrap; border-top: 1px solid var(--line); }
+.works-intro { flex: 1 1 320px; padding: 24px 40px 40px 0; display: flex; flex-direction: column; gap: 14px; }
+.quote { margin: 0 0 12px; display: flex; flex-direction: column; gap: 10px; }
+.quote blockquote { margin: 0; font-size: 20px; line-height: 1.45; font-weight: 500; }
+.motto { margin: 0; font-size: 16px; line-height: 1.6; font-weight: 500; }
+.works-list { flex: 2 1 480px; min-width: 0; margin: 0; padding: 0; list-style: none; border-left: 1px solid var(--line); }
+.works-list li {
+  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
+  padding: 20px 0 20px 32px; border-bottom: 1px solid var(--line);
+}
+.works-list li:last-child { border-bottom: 0; }
+.works-fig { width: 56px; }
+.works-name { flex: 1 1 160px; font-size: 20px; font-weight: 700; }
+.works-desc { flex: 2 1 200px; font-size: 15px; color: var(--muted); }
+/* The two columns stop fitting side by side below ~900px: stack them. */
+@media (max-width: 900px) {
+  .works-intro { padding-right: 0; }
+  .works-list { border-left: 0; border-top: 1px solid var(--line); }
+  .works-list li { padding-left: 0; }
+}
 
 .page { padding: 64px 0; }
 .page h2 { font-size: 2rem; margin: 0 0 16px; }

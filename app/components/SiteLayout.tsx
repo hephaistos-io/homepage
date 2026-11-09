@@ -19,9 +19,9 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <main className="main">{children}</main>
-      <footer className="footer">
+      <footer className="footer mono">
         <span>hephaistos.io</span>
-        <span>© {new Date().getFullYear()}</span>
+        <span>sheet 1 of 1</span>
       </footer>
     </div>
   )
