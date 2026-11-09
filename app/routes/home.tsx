@@ -1,14 +1,9 @@
 import SpecWordmark from '../components/SpecWordmark'
+import ProjectItem from '../components/ProjectItem'
+import { projects } from '../projects'
 import type { Route } from './+types/home'
 
 export const meta: Route.MetaFunction = () => [{ title: 'hephaistos' }]
-
-// Placeholder content until real projects exist.
-const projects = [
-  { name: '[Project one]', description: '[One-line description]' },
-  { name: '[Project two]', description: '[One-line description]' },
-  { name: '[Project three]', description: '[One-line description]' },
-]
 
 export default function Home() {
   return (
@@ -28,12 +23,9 @@ export default function Home() {
           <p className="motto">Building whatever the spark leads me to.</p>
         </div>
         <ol className="works-list">
+          {/* fig. 1 is the quote, so projects start at fig. 2. */}
           {projects.map((p, i) => (
-            <li key={i}>
-              <span className="mono works-fig">fig. {i + 2}</span>
-              <span className="works-name">{p.name}</span>
-              <span className="works-desc">{p.description}</span>
-            </li>
+            <ProjectItem key={p.name} fig={i + 2} project={p} />
           ))}
         </ol>
       </section>
