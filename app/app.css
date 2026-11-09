@@ -1,0 +1,59 @@
+/*
+ * Tones: not pure black/white. Adjust --paper / --ink to taste;
+ * everything else derives from them.
+ */
+:root {
+  --paper: #f3f2ee;
+  --ink: #161616;
+  --muted: color-mix(in oklab, var(--ink) 62%, var(--paper));
+  --line: var(--ink);
+  --accent: #e10600;
+  color-scheme: light;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141414;
+    --ink: #ebeae5;
+    --accent: #ff2a1a;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); }
+a { color: inherit; }
+
+.shell { min-height: 100vh; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+@media (max-width: 600px) { .shell { padding: 0 16px; } }
+
+.header { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 28px 0; border-bottom: 1px solid var(--line); }
+.brand { font-size: 20px; line-height: 1; color: var(--ink); }
+.nav { display: flex; gap: 28px; align-items: center; font-size: 14px; font-weight: 500; }
+.nav a { text-decoration: none; color: var(--muted); display: inline-flex; align-items: center; gap: 2px; }
+.nav a:hover, .nav a.active { color: var(--ink); }
+
+.main { flex: 1; display: flex; flex-direction: column; }
+
+.hero { padding: 120px 0 72px; }
+/* The wordmark scales with font-size (its width is ~5.07em). */
+.hero-title { margin: 0; font-size: clamp(56px, 18vw, 210px); line-height: 1; font-weight: 800; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); border-top: 1px solid var(--line); }
+.cell { padding: 24px 24px 40px; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--line); }
+.cell:first-child { border-left: 0; padding-left: 0; }
+@media (max-width: 600px) {
+  .cell { border-left: 0; padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .cell:last-child { border-bottom: 0; }
+}
+.cell-index { font-size: 12px; font-weight: 500; color: var(--muted); }
+.cell-name { margin: 0; font-size: 20px; font-weight: 700; }
+.cell-desc { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+
+.page { padding: 64px 0; }
+.page h2 { font-size: 2rem; margin: 0 0 16px; }
+
+.footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
