@@ -35,7 +35,7 @@ export default function Contact() {
           <br />
           Postfach
           <br />
-          8126 Zürich
+          8126 Zumikon
           <br />
           Switzerland
         </address>
