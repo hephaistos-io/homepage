@@ -14,8 +14,17 @@ export default function Contact() {
       <div className="prose">
         <h1>Contact</h1>
         <p>
-          [Contact text.] Email <a href="mailto:[email]">[email]</a>.
+          <a href="mailto:admin@hephaistos.io">admin@hephaistos.io</a>
         </p>
+        <address className="contact-address">
+          Ricardo Simoes
+          <br />
+          Postfach
+          <br />
+          8126 Zürich
+          <br />
+          Switzerland
+        </address>
       </div>
     </article>
   )
