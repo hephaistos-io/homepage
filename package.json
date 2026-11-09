@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build && node scripts/spa-404.mjs",
-    "preview": "vite preview --outDir build/client",
+    "preview": "node scripts/serve.mjs",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {

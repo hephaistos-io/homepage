@@ -6,7 +6,7 @@ React Router (framework mode, static prerender) + lucide-react, deployed to GitH
 npm install
 npm run dev        # local dev server
 npm run build      # prerendered static site in build/client
-npm run preview    # serve build/client
+npm run preview    # serve build/client like GitHub Pages
 npm run typecheck
 ```
 
