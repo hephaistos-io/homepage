@@ -23,6 +23,7 @@ export default function ProjectPage({ params }: Route.ComponentProps) {
       ['stack', project.stack],
     ] as const
   ).filter(([, value]) => value)
+  const hasLinks = Boolean(project.links?.length) || project.hasPrivacy
 
   return (
     <article className="project">
@@ -40,7 +41,7 @@ export default function ProjectPage({ params }: Route.ComponentProps) {
               <span className="mono muted">fig. {project.fig}</span>
               <h1>{project.name}</h1>
             </div>
-            {(rows.length > 0 || project.links?.length) && (
+            {(rows.length > 0 || hasLinks) && (
               <dl className="titleblock-rows">
                 {rows.map(([label, value]) => (
                   <div key={label}>
@@ -48,18 +49,19 @@ export default function ProjectPage({ params }: Route.ComponentProps) {
                     <dd>{value}</dd>
                   </div>
                 ))}
-                {project.links?.length ? (
+                {hasLinks && (
                   <div>
                     <dt className="mono muted">links</dt>
                     <dd className="titleblock-links">
-                      {project.links.map((l) => (
+                      {project.links?.map((l) => (
                         <a key={l.href} href={l.href} target="_blank" rel="noreferrer">
                           {l.label} <ArrowUpRight size={14} />
                         </a>
                       ))}
+                      {project.hasPrivacy && <Link to={`/projects/${project.slug}/privacy`}>Privacy notice</Link>}
                     </dd>
                   </div>
-                ) : null}
+                )}
               </dl>
             )}
           </div>

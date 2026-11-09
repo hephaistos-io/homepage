@@ -137,6 +137,17 @@ a { color: inherit; }
 .project-body > * { margin: 0 0 1em; }
 .project-body > :last-child { margin-bottom: 0; }
 
+/* Long-form text pages: privacy notices, contact. */
+.doc { padding: 0 0 64px; display: flex; flex-direction: column; gap: 8px; }
+.doc-back { padding: 24px 0 16px; text-decoration: none; align-self: flex-start; }
+.doc-back:hover { color: var(--ink); }
+.prose { max-width: 68ch; font-size: 16px; line-height: 1.6; }
+.prose h1 { margin: 24px 0 16px; font-size: clamp(32px, 6vw, 48px); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+.prose h2 { margin: 32px 0 8px; font-size: 20px; font-weight: 700; }
+.prose h3 { margin: 24px 0 8px; font-size: 16px; font-weight: 700; }
+.prose p, .prose ul, .prose ol { margin: 0 0 1em; }
+.prose ul, .prose ol { padding-left: 1.25em; }
+
 .page { padding: 64px 0; }
 .page h2 { font-size: 2rem; margin: 0 0 16px; }
 

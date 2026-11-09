@@ -1,11 +1,24 @@
 import { existsSync, readdirSync } from 'node:fs'
 import type { Config } from '@react-router/dev/config'
-import { folderToSlug } from './app/projects/slug'
+import type { ProjectMeta } from './app/projects/types'
+import { projectSlug } from './app/projects/slug'
 
-// Every folder in app/projects with a project.tsx gets a /projects/<slug> page.
-const projectPaths = readdirSync('app/projects', { withFileTypes: true })
-  .filter((d) => d.isDirectory() && existsSync(`app/projects/${d.name}/project.tsx`))
-  .map((d) => `/projects/${folderToSlug(d.name)}`)
+// Every folder in app/projects with a project.tsx gets /projects/<slug>, plus
+// /projects/<slug>/privacy when it has a privacy.mdx. project.tsx is imported
+// (not just listed) so a fixed `slug` field is honoured.
+const projectPaths = async () => {
+  const folders = readdirSync('app/projects', { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(`app/projects/${d.name}/project.tsx`))
+    .map((d) => d.name)
+  const paths: string[] = []
+  for (const folder of folders) {
+    const meta: ProjectMeta = (await import(`./app/projects/${folder}/project.tsx`)).default
+    const base = `/projects/${projectSlug(folder, meta)}`
+    paths.push(base)
+    if (existsSync(`app/projects/${folder}/privacy.mdx`)) paths.push(`${base}/privacy`)
+  }
+  return paths
+}
 
 /**
  * Static build for GitHub Pages:
@@ -17,6 +30,6 @@ const projectPaths = readdirSync('app/projects', { withFileTypes: true })
  */
 export default {
   ssr: false,
-  prerender: ({ getStaticPaths }) => [...getStaticPaths(), ...projectPaths],
+  prerender: async ({ getStaticPaths }) => [...getStaticPaths(), ...(await projectPaths())],
   basename: process.env.BASE_PATH ?? '/',
 } satisfies Config
