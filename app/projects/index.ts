@@ -8,10 +8,11 @@ import type { Project, ProjectImage, ProjectMeta } from './types'
 // The globs are resolved at build time, so everything ends up in the
 // prerendered HTML. Image imports give hashed URLs under /assets.
 const metas = import.meta.glob<ProjectMeta>('./*/project.tsx', { eager: true, import: 'default' })
-const imageUrls = import.meta.glob<string>('./*/images/*.{png,jpg,jpeg,webp,avif,gif,svg}', {
-  eager: true,
-  import: 'default',
-})
+// `?dims` (vite.config.ts) gives { src, width, height } per image.
+const imageUrls = import.meta.glob<{ src: string; width: number; height: number }>(
+  './*/images/*.{png,jpg,jpeg,webp,avif,gif,svg}',
+  { eager: true, query: '?dims', import: 'default' },
+)
 // Only the file list is needed here; the privacy route loads the content.
 // `?raw` + lazy keeps this from touching the compiled MDX modules (no chunk
 // conflict with the route's eager import), and nothing here is ever called.
@@ -23,7 +24,7 @@ const fileOf = (path: string) => path.split('/').pop()!
 const imagesByFolder = new Map<string, ProjectImage[]>()
 for (const path of Object.keys(imageUrls).sort((a, b) => naturalCompare(fileOf(a), fileOf(b)))) {
   const list = imagesByFolder.get(folderOf(path)) ?? []
-  list.push({ src: imageUrls[path], file: fileOf(path) })
+  list.push({ ...imageUrls[path], file: fileOf(path) })
   imagesByFolder.set(folderOf(path), list)
 }
 const privacyFolders = new Set(Object.keys(privacyFiles).map(folderOf))

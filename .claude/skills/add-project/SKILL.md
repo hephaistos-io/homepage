@@ -41,10 +41,8 @@ Leave out what you don't have; empty fields are not shown. Only `name` and `desc
 ## 3. Images (`images/`)
 
 - Order = filename, natural sort: `1_overview.png`, `2_widgets.png`, … `10_…` comes after `9_…`.
-- The first image is shown first in the 16:9 stage; thumbnails below switch it.
-- The stage shows the whole image (letterboxed, never cropped); thumbnails are square crops.
-- Prepare images at 16:9, about 2400×1350, as WebP or JPEG (PNG only for flat graphics). They ship as-is: nothing resizes them.
-- Phone screenshots: compose 2–3 screens side by side on a 16:9 canvas. A single portrait screenshot shows small in the 16:9 stage.
+- Any size or shape, mixed freely. The page shows them in a sideways-scrolling strip, all at the same height and each at its own width: phone screenshots sit side by side, landscape shots take most of the width. Nothing is cropped (thumbnails are square crops).
+- Export at most ~2400px on the long edge, as WebP or JPEG (PNG for flat graphics). Files ship as-is: nothing resizes them.
 - No `images/` folder: the page shows only the title block.
 
 ## 4. Privacy notice (`privacy.mdx`)

@@ -17,7 +17,7 @@ export type ProjectMeta = {
   body?: ReactNode
 }
 
-export type ProjectImage = { src: string; file: string }
+export type ProjectImage = { src: string; file: string; width: number; height: number }
 
 export type Project = ProjectMeta & {
   slug: string
