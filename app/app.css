@@ -95,6 +95,8 @@ a { color: inherit; }
 .project-grid { flex: 1; display: flex; flex-wrap: wrap; gap: 32px; align-items: stretch; }
 .project-media { flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; }
 .project-aside { flex: 2 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+/* No images: no gallery column, so keep the title block at a readable width. */
+.project-aside:only-child { max-width: 560px; }
 /* Once the columns stack (560 + 340 + 32 gap + 2×40 padding = 1012px), don't
    stretch the stacked rows to fill the screen; the fill is a desktop thing. */
 @media (max-width: 1011px) { .project-grid { align-content: flex-start; } }

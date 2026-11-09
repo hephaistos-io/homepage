@@ -31,10 +31,12 @@ export default function ProjectPage({ params }: Route.ComponentProps) {
         ← work / fig. {project.fig}
       </Link>
       <div className="project-grid">
-        <div className="project-media">
-          {/* key: reset the selected image when navigating between projects */}
-          <Gallery key={project.slug} images={project.images} fig={project.fig} />
-        </div>
+        {project.images.length > 0 && (
+          <div className="project-media">
+            {/* key: reset the selected image when navigating between projects */}
+            <Gallery key={project.slug} images={project.images} fig={project.fig} />
+          </div>
+        )}
         <aside className="project-aside">
           <div className="titleblock">
             <div className="titleblock-head">
