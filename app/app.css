@@ -156,54 +156,66 @@ a { color: inherit; }
 
 .footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 
-/* CV (/cv): one row per section, small mono label left, entries right. */
+/* CV (/cv). Sections open with a rule carrying their label (like a drawing
+   sheet's zone header). Experience is grouped per organisation: company on
+   the left, a vertical dimension line with a tick at each role. Short
+   sections are grids of thin-framed boxes (title-block fields). */
 .print-only { display: none; }
 .cv { padding: 0 0 64px; }
 .cv-head {
   display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: flex-end; justify-content: space-between;
-  padding: 56px 0 40px; border-bottom: 1px solid var(--line);
+  padding: 56px 0 40px;
 }
 .cv-head-text { display: flex; flex-direction: column; gap: 10px; }
 .cv-head h1 { margin: 0; font-size: clamp(36px, 6vw, 72px); line-height: 1; font-weight: 800; letter-spacing: -0.03em; }
 .cv-headline { margin: 0; font-size: 20px; line-height: 1.4; font-weight: 500; }
-.cv-print {
-  color: inherit; background: none; border: 1px solid var(--line); padding: 12px 16px; min-height: 44px; cursor: pointer;
-}
+.cv-print { color: inherit; background: none; border: 1px solid var(--line); padding: 12px 16px; min-height: 44px; cursor: pointer; }
 .cv-print:hover { background: var(--ink); color: var(--paper); }
-.cv-section { border-bottom: 1px solid var(--line); }
-.cv-row { display: flex; flex-wrap: wrap; }
-.cv-first + .cv-row > .cv-body > :first-child { border-top: 1px solid color-mix(in oklab, var(--ink) 18%, var(--paper)); }
-.cv-section:last-child { border-bottom: 0; }
-.cv-label { flex: 0 0 200px; margin: 0; padding: 26px 0; }
-.cv-body { flex: 1 1 480px; min-width: 0; }
-.cv-entry {
-  display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 4px 24px; padding: 24px 0;
-  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, var(--paper));
+
+.cv-section { margin-top: 8px; padding-bottom: 32px; }
+.cv-sec-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  border-top: 2px solid var(--line); padding: 10px 0 20px; font-size: 12px;
 }
-.cv-entry:last-child { border-bottom: 0; }
-.cv-when { padding-top: 4px; }
-.cv-what { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.cv-title-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px; }
-.cv-what h3 { margin: 0; font-size: 18px; font-weight: 700; }
-.cv-where { font-size: 15px; color: var(--muted); }
-.cv-link { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); }
-.cv-link:hover { color: var(--ink); }
+.cv-sec-head h2 { margin: 0; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Experience: [company rail | dimension chain of roles] */
+.cv-org { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 32px; }
+.cv-org + .cv-org { margin-top: 28px; }
+.cv-org-rail { display: flex; flex-direction: column; gap: 4px; padding-top: 2px; font-size: 14px; }
+.cv-org-rail h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.cv-org-rail .mono { margin-top: 4px; }
+.cv-chain { position: relative; border-left: 1px solid var(--line); }
+/* The end tick at the bottom of the chain. */
+.cv-chain::after { content: ''; position: absolute; left: -6px; bottom: 0; width: 11px; border-top: 1px solid var(--line); }
+.cv-role { position: relative; padding: 0 0 24px 24px; display: flex; flex-direction: column; gap: 4px; }
+.cv-role:last-child { padding-bottom: 8px; }
+/* Tick where each role starts on the dimension line. */
+.cv-role::before { content: ''; position: absolute; left: -6px; top: 8px; width: 11px; border-top: 1px solid var(--line); }
+.cv-role-when { line-height: 16px; }
+.cv-role h4 { margin: 0; font-size: 17px; font-weight: 700; }
 .cv-group { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
-.cv-group h4 { margin: 0; font-size: 14px; font-weight: 700; }
+.cv-group h5 { margin: 0; font-size: 14px; font-weight: 700; }
 .cv-points { margin: 6px 0 0; padding-left: 1.1em; font-size: 15px; line-height: 1.55; display: flex; flex-direction: column; gap: 4px; }
 .cv-group .cv-points { margin-top: 0; }
-.cv-desc, .cv-profile { margin: 0; font-size: 15px; line-height: 1.55; max-width: 72ch; }
-.cv-pairs { margin: 0; padding: 24px 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.5; }
-.cv-pairs > div { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 4px 24px; }
-.cv-pairs dt { padding-top: 2px; }
-.cv-pairs dd { margin: 0; }
-@media (max-width: 600px) {
-  .cv-label { padding: 20px 0 0; }
-  .cv-entry, .cv-pairs > div { grid-template-columns: minmax(0, 1fr); }
-  .cv-row:not(.cv-first) > .cv-label { display: none; }
+
+/* Boxes: grid where neighbouring frames share their 1px lines. */
+.cv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.cv-grid-1 { grid-template-columns: minmax(0, 1fr); }
+.cv-grid-skills { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+.cv-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
+.cv-box-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; flex-wrap: wrap; font-size: 12px; }
+.cv-box h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.cv-link { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); }
+.cv-link:hover { color: var(--ink); }
+.cv-desc, .cv-profile { margin: 0; font-size: 15px; line-height: 1.55; }
+.cv-profile { max-width: 72ch; }
+
+@media (max-width: 700px) {
+  .cv-org { grid-template-columns: minmax(0, 1fr); gap: 12px; }
 }
 
-/* Printing (any page, but laid out for /cv): A4, black on white, no chrome. */
+/* Printing (laid out for /cv): A4, black on white, no site chrome. */
 @media print {
   @page {
     size: A4;
@@ -218,28 +230,36 @@ a { color: inherit; }
   a { text-decoration: none; }
 
   .cv { padding: 0; font-size: 9.5pt; }
-  .cv-head { padding: 0 0 10pt; gap: 4pt; }
-  .cv-head-text { gap: 4pt; }
+  .cv-head { padding: 0 0 8pt; gap: 4pt; }
+  .cv-head-text { gap: 3pt; }
   .cv-head h1 { font-size: 22pt; }
   .cv-headline { font-size: 11pt; }
-  .cv .mono { font-size: 7.5pt; }
-  .cv-label { flex: 0 0 22mm; padding: 9pt 0; }
-  .cv-body { flex: 1 1 0; }
-  .cv-entry { grid-template-columns: 31mm minmax(0, 1fr); gap: 1pt 10pt; padding: 7pt 0; border-bottom-color: #bdbdbd; }
-  .cv-when { padding-top: 1.5pt; }
-  .cv-what { gap: 2pt; }
-  .cv-what h3 { font-size: 10.5pt; }
-  .cv-where, .cv-desc, .cv-points, .cv-pairs { font-size: 9pt; }
-  .cv-points { gap: 1.5pt; margin-top: 2pt; line-height: 1.4; }
+  .cv .mono, .cv-sec-head, .cv-sec-head h2, .cv-box-top { font-size: 7.5pt; }
+  .cv-section { margin-top: 4pt; padding-bottom: 10pt; }
+  .cv-sec-head { border-top-width: 1.5pt; padding: 4pt 0 8pt; }
+  .cv-org { grid-template-columns: 36mm minmax(0, 1fr); gap: 0 12pt; }
+  .cv-org + .cv-org { margin-top: 10pt; }
+  .cv-org-rail { font-size: 8.5pt; gap: 2pt; }
+  .cv-org-rail h3 { font-size: 10.5pt; }
+  .cv-role { padding: 0 0 9pt 12pt; gap: 1.5pt; }
+  .cv-role::before { top: 4pt; }
+  .cv-role h4 { font-size: 10.5pt; }
   .cv-group { margin-top: 4pt; gap: 1pt; }
-  .cv-group h4 { font-size: 9pt; }
-  .cv-pairs { padding: 8pt 0; gap: 3pt; }
-  .cv-pairs > div { grid-template-columns: 31mm minmax(0, 1fr); gap: 0 10pt; }
+  .cv-group h5 { font-size: 9pt; }
+  .cv-points { font-size: 9pt; gap: 1.5pt; margin-top: 2pt; line-height: 1.4; }
+  .cv-grid, .cv-grid-skills { grid-template-columns: 1fr 1fr; }
+  /* A grid split across pages gets its frame closed/reopened at the break. */
+  .cv-grid { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .cv-grid-1 { grid-template-columns: minmax(0, 1fr); }
+  .cv-box { padding: 6pt 8pt 7pt; gap: 2pt; }
+  .cv-box h3 { font-size: 10pt; }
+  .cv-desc { font-size: 9pt; line-height: 1.4; }
 
-  /* Long entries may split between bullets, but a title stays with its first
-     bullet. Short entries (no bullets), and a label with its first entry,
-     never split. */
-  .cv-title-row, .cv-where, .cv-group h4 { break-after: avoid; }
-  .cv-points li, .cv-pairs > div { break-inside: avoid; }
-  .cv-entry:not(:has(.cv-points)), .cv-first:not(:has(.cv-points)) { break-inside: avoid; }
+  /* Keep a boxed section's rule with its first row (not experience: that
+     would let the browser push it whole to page 2), a role's title with its
+     first bullet; never split a bullet or a box. */
+  .cv-sec-head:has(+ .cv-grid), .cv-role-when, .cv-role h4, .cv-group h5 { break-after: avoid; }
+  /* (No break-inside on the company rail: Chrome then refuses to split the
+     whole row, pushing the first company to page 2.) */
+  .cv-points li, .cv-box { break-inside: avoid; }
 }

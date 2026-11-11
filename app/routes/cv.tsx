@@ -1,8 +1,8 @@
-import { Children, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import type { Route } from './+types/cv'
 import { cv } from '../cv/cv'
-import type { Month } from '../cv/types'
+import type { Experience, Month } from '../cv/types'
 
 export const meta: Route.MetaFunction = () => [
   { title: `CV — ${cv.name}` },
@@ -15,40 +15,29 @@ const month = (m: Month) => {
   return mm ? `${MONTHS[Number(mm) - 1]} ${y}` : y
 }
 const span = (start: Month, end: Month | null) => `${month(start)} — ${end ? month(end) : 'present'}`
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 
-// The label shares a row with the section's first entry only, so in print the
-// two move to a new page together (a label is never left alone at a page end).
-function Section({ label, children }: { label: string; children: ReactNode }) {
-  const [first, ...rest] = Children.toArray(children)
-  return (
-    <section className="cv-section">
-      <div className="cv-row cv-first">
-        <h2 className="mono muted cv-label">{label}</h2>
-        <div className="cv-body">{first}</div>
-      </div>
-      {rest.length > 0 && (
-        <div className="cv-row">
-          <span className="cv-label" aria-hidden="true" />
-          <div className="cv-body">{rest}</div>
-        </div>
-      )}
-    </section>
-  )
+/** Consecutive roles at the same organisation form one group (one dimension chain). */
+function byOrg(roles: Experience[]) {
+  const groups: { org: string; place: string; roles: Experience[] }[] = []
+  for (const r of roles) {
+    const last = groups[groups.length - 1]
+    if (last && last.org === r.org) last.roles.push(r)
+    else groups.push({ org: r.org, place: r.place, roles: [r] })
+  }
+  return groups
 }
 
-function Entry({ when, title, where, aside, children }: { when: string; title: string; where?: ReactNode; aside?: ReactNode; children?: ReactNode }) {
+/** A section: a full-width rule with the label set on it, count on the right. */
+function Section({ label, count, children }: { label: string; count?: string; children: ReactNode }) {
   return (
-    <article className="cv-entry">
-      <span className="mono muted cv-when">{when}</span>
-      <div className="cv-what">
-        <div className="cv-title-row">
-          <h3>{title}</h3>
-          {aside}
-        </div>
-        {where && <span className="cv-where">{where}</span>}
-        {children}
-      </div>
-    </article>
+    <section className="cv-section">
+      <header className="cv-sec-head mono">
+        <h2>{label}</h2>
+        {count && <span className="muted">{count}</span>}
+      </header>
+      {children}
+    </section>
   )
 }
 
@@ -60,7 +49,22 @@ const Points = ({ points }: { points: string[] }) => (
   </ul>
 )
 
+/** A thin-framed box, like a field in a drawing's title block. */
+function Box({ tag, title, aside, children }: { tag: string; title: string; aside?: ReactNode; children?: ReactNode }) {
+  return (
+    <article className="cv-box">
+      <div className="cv-box-top mono muted">
+        <span>{tag}</span>
+        {aside}
+      </div>
+      {title && <h3>{title}</h3>}
+      {children}
+    </article>
+  )
+}
+
 export default function CvPage() {
+  const orgs = byOrg(cv.experience)
   return (
     <article className="cv">
       <header className="cv-head">
@@ -84,34 +88,54 @@ export default function CvPage() {
         </Section>
       )}
 
-      <Section label="experience">
-        {cv.experience.map((e) => (
-          <Entry key={e.role + e.start} when={span(e.start, e.end)} title={e.role} where={`${e.org} · ${e.place}`}>
-            {e.points && <Points points={e.points} />}
-            {e.groups?.map((g) => (
-              <div key={g.title} className="cv-group">
-                <h4>{g.title}</h4>
-                <Points points={g.points} />
+      <Section label="experience" count={plural(cv.experience.length, 'role')}>
+        {orgs.map((g) => {
+          const first = g.roles[g.roles.length - 1]
+          const latest = g.roles[0]
+          return (
+            <div key={g.org + first.start} className="cv-org">
+              <div className="cv-org-rail">
+                <h3>{g.org}</h3>
+                <span className="muted">{g.place}</span>
+                <span className="mono muted">{span(first.start, latest.end)}</span>
               </div>
-            ))}
-          </Entry>
-        ))}
+              <div className="cv-chain">
+                {g.roles.map((r) => (
+                  <div key={r.role + r.start} className="cv-role">
+                    <span className="mono muted cv-role-when">{span(r.start, r.end)}</span>
+                    <h4>{r.role}</h4>
+                    {r.points && <Points points={r.points} />}
+                    {r.groups?.map((grp) => (
+                      <div key={grp.title} className="cv-group">
+                        <h5>{grp.title}</h5>
+                        <Points points={grp.points} />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
       </Section>
 
       {cv.publications.length > 0 && (
         <Section label="publications">
-          {cv.publications.map((p) => (
-            <Entry key={p.title} when={p.year} title={p.title} where={p.href ? <a href={p.href}>{p.venue}</a> : `Published in ${p.venue}`} />
-          ))}
+          <div className="cv-grid cv-grid-1">
+            {cv.publications.map((p) => (
+              <Box key={p.title} tag={p.year} title={p.title}>
+                <p className="cv-desc">{p.href ? <a href={p.href}>{p.venue}</a> : `Published in ${p.venue}`}</p>
+              </Box>
+            ))}
+          </div>
         </Section>
       )}
 
       <Section label="skills">
-        <dl className="cv-pairs">
+        <div className="cv-grid cv-grid-skills">
           {cv.skills.map((s) => (
-            <div key={s.group}>
-              <dt className="mono muted">{s.group}</dt>
-              <dd>
+            <Box key={s.group} tag={s.group.toLowerCase()} title="">
+              <p className="cv-desc">
                 {s.core.map((c, i) => (
                   <span key={c}>
                     <strong>{c}</strong>
@@ -119,47 +143,55 @@ export default function CvPage() {
                   </span>
                 ))}
                 {s.other?.join(', ')}
-              </dd>
-            </div>
+              </p>
+            </Box>
           ))}
-          <div>
-            <dt className="mono muted">Spoken languages</dt>
-            <dd>{cv.languages.join(', ')}</dd>
-          </div>
-        </dl>
+          <Box tag="spoken languages" title="">
+            <p className="cv-desc">{cv.languages.join(', ')}</p>
+          </Box>
+        </div>
       </Section>
 
-      <Section label="projects">
-        {cv.projects.map((p) => (
-          <Entry
-            key={p.name}
-            when={p.role}
-            title={p.name}
-            aside={
-              p.link && (
-                <a className="mono cv-link" href={p.link.href} target="_blank" rel="noreferrer">
-                  {p.link.label} <ArrowUpRight size={12} />
-                </a>
-              )
-            }
-          >
-            <p className="cv-desc">{p.description}</p>
-          </Entry>
-        ))}
+      <Section label="projects" count={plural(cv.projects.length, 'project')}>
+        <div className="cv-grid">
+          {cv.projects.map((p) => (
+            <Box
+              key={p.name}
+              tag={p.role}
+              title={p.name}
+              aside={
+                p.link && (
+                  <a className="cv-link" href={p.link.href} target="_blank" rel="noreferrer">
+                    {p.link.label} <ArrowUpRight size={12} />
+                  </a>
+                )
+              }
+            >
+              <p className="cv-desc">{p.description}</p>
+            </Box>
+          ))}
+        </div>
       </Section>
 
-      <Section label="certificates">
-        {cv.certificates.map((c) => (
-          <Entry key={c.name} when={month(c.date)} title={c.name} where={c.issuer} />
-        ))}
+      <Section label="certificates" count={plural(cv.certificates.length, 'certificate')}>
+        <div className="cv-grid">
+          {cv.certificates.map((c) => (
+            <Box key={c.name} tag={month(c.date)} title={c.name}>
+              <p className="cv-desc muted">{c.issuer}</p>
+            </Box>
+          ))}
+        </div>
       </Section>
 
       <Section label="education">
-        {cv.education.map((e) => (
-          <Entry key={e.school} when={span(e.start, e.end)} title={e.school} where={`${e.degree} · ${e.place}`}>
-            {e.note && <p className="cv-desc">{e.note}</p>}
-          </Entry>
-        ))}
+        <div className="cv-grid">
+          {cv.education.map((e) => (
+            <Box key={e.school} tag={span(e.start, e.end)} title={e.school} aside={<span>{e.place}</span>}>
+              <p className="cv-desc">{e.degree}</p>
+              {e.note && <p className="cv-desc muted">{e.note}</p>}
+            </Box>
+          ))}
+        </div>
       </Section>
     </article>
   )
