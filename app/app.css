@@ -1,265 +1,404 @@
 /*
- * Tones: not pure black/white. Adjust --paper / --ink to taste;
- * everything else derives from them.
+ * hephaistos.io — the site's only stylesheet.
+ *
+ * Order of precedence is set by cascade layers, not by selector tricks:
+ * later layers win regardless of specificity, so print rules beat component
+ * rules without !important.
+ *
+ *   tokens      every colour, font, size and line weight, defined once
+ *   base        element defaults
+ *   layout      page shell: header, main, footer
+ *   components  one block per component, states and breakpoints nested inside
+ *   print       paper output (laid out for /cv)
+ *
+ * Breakpoints (native CSS can't name them yet, so they're repeated):
+ *   600px  phone       700px  CV rail stacks
+ *   900px  home works list stacks      1011px  project columns stack
  */
-:root {
-  --paper: #f3f2ee;
-  --ink: #161616;
-  --muted: color-mix(in oklab, var(--ink) 62%, var(--paper));
-  --line: var(--ink);
-  --accent: #e10600;
-  color-scheme: light;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  color: var(--ink);
-  background: var(--paper);
-}
+@layer tokens, base, layout, components, print;
 
-@media (prefers-color-scheme: dark) {
+/* ─── tokens ──────────────────────────────────────────────────────────── */
+@layer tokens {
   :root {
-    --paper: #141414;
-    --ink: #ebeae5;
-    --accent: #ff2a1a;
-    color-scheme: dark;
+    /* light-dark(<light>, <dark>) follows the visitor's colour scheme. */
+    color-scheme: light dark;
+    --paper: light-dark(#f3f2ee, #141414);
+    --ink: light-dark(#161616, #ebeae5);
+    --accent: light-dark(#e10600, #ff2a1a);
+
+    /* Derived from paper/ink, so they follow the scheme automatically. */
+    --muted: color-mix(in oklab, var(--ink) 62%, var(--paper));
+    --line: var(--ink);
+    --line-soft: color-mix(in oklab, var(--ink) 18%, var(--paper));
+    --line-guide: color-mix(in oklab, var(--ink) 45%, transparent);
+    --fill-soft: color-mix(in oklab, var(--ink) 4%, var(--paper));
+
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* Type scale (px on screen; print has its own pt sizes). */
+    --text-xs: 11px;    /* spec labels, thumbnail labels */
+    --text-label: 12px; /* mono labels */
+    --text-footer: 13px;
+    --text-sm: 14px;
+    --text-body: 15px;
+    --text-md: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+
+    --hairline: 1px solid var(--line);
+    --touch: 44px;      /* minimum hit target */
+    --page-max: 1200px;
+    --gutter: 40px;
   }
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--paper); }
-a { color: inherit; }
-
-.shell { min-height: 100vh; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-@media (max-width: 600px) { .shell { padding: 0 16px; } }
-
-.header { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 28px 0; border-bottom: 1px solid var(--line); }
-.brand { font-size: 20px; line-height: 1; color: var(--ink); }
-.nav { display: flex; gap: 28px; align-items: center; font-size: 14px; font-weight: 500; }
-.nav a { text-decoration: none; color: var(--muted); display: inline-flex; align-items: center; gap: 2px; }
-.nav a:hover, .nav a.active { color: var(--ink); }
-
-.main { flex: 1; display: flex; flex-direction: column; }
-
-.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; font-weight: 400; }
-.muted { color: var(--muted); }
-
-/* Hero: the wordmark as a technical figure. Top padding leaves room for the leader label. */
-.hero { padding: 150px 0 72px; }
-.hero-title { margin: 0; font-size: clamp(56px, 18vw, 210px); line-height: 1; }
-
-.spec { position: relative; display: inline-block; color: var(--ink); }
-.spec-guide {
-  position: absolute; left: -3%; right: -3%; top: var(--y);
-  border-top: 1px dashed color-mix(in oklab, var(--ink) 45%, transparent);
-}
-.spec-label, .spec-fig {
-  position: absolute; white-space: nowrap;
-  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 400; line-height: 1;
-}
-.spec-label { right: 0; }
-.spec-label--above { bottom: 4px; }
-.spec-label--below { top: 4px; }
-.spec-fig { left: var(--x); top: var(--y); font-size: 12px; transform: translate(8px, -50%); }
-@media (max-width: 600px) {
-  .spec-guide { left: 0; right: 0; }
-  .spec-label { display: none; }
-  .spec-fig-long { display: none; }
-}
-
-/* Below the hero: quote + motto on the left, numbered works on the right. */
-.works { display: flex; flex-wrap: wrap; border-top: 1px solid var(--line); }
-.works-intro { flex: 1 1 320px; padding: 24px 40px 40px 0; display: flex; flex-direction: column; gap: 14px; }
-.quote { margin: 0 0 12px; display: flex; flex-direction: column; gap: 10px; }
-.quote blockquote { margin: 0; font-size: 20px; line-height: 1.45; font-weight: 500; }
-.motto { margin: 0; font-size: 16px; line-height: 1.6; font-weight: 500; }
-.works-list { flex: 2 1 480px; min-width: 0; margin: 0; padding: 0; list-style: none; border-left: 1px solid var(--line); }
-.works-list li { border-bottom: 1px solid var(--line); }
-.works-list li:last-child { border-bottom: 0; }
-.works-row {
-  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
-  padding: 20px 0 20px 32px; color: inherit; text-decoration: none;
-}
-.works-row:hover .works-name { text-decoration: underline; }
-.works-fig { width: 56px; }
-.works-name { flex: 1 1 160px; font-size: 20px; font-weight: 700; }
-.works-desc { flex: 2 1 200px; font-size: 15px; color: var(--muted); }
-/* The two columns stop fitting side by side below ~900px: stack them. */
-@media (max-width: 900px) {
-  .works-intro { padding-right: 0; }
-  .works-list { border-left: 0; border-top: 1px solid var(--line); }
-  .works-row { padding-left: 0; }
-}
-
-/* Project page: gallery left, title block right; fills the screen height. */
-.project { flex: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
-.project-back { padding: 24px 0; text-decoration: none; align-self: flex-start; }
-.project-back:hover { color: var(--ink); }
-.project-grid { flex: 1; display: flex; flex-wrap: wrap; gap: 32px; align-items: stretch; }
-.project-media { flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; }
-.project-aside { flex: 2 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
-/* No images: no gallery column, so keep the title block at a readable width. */
-.project-aside:only-child { max-width: 560px; }
-/* Once the columns stack (560 + 340 + 32 gap + 2×40 padding = 1012px), don't
-   stretch the stacked rows to fill the screen; the fill is a desktop thing. */
-@media (max-width: 1011px) { .project-grid { align-content: flex-start; } }
-
-.gallery { display: flex; flex-direction: column; gap: 12px; }
-.stage { margin: 0; display: flex; flex-direction: column; gap: 8px; }
-/* Full column width; height from the tallest image's shape (inline
-   aspect-ratio), capped to what fits on screen above the thumbnail row
-   (420px ≈ header + back link + caption + thumbnails + footer). */
-.stage-frame {
-  position: relative; width: 100%; max-height: clamp(320px, calc(100svh - 420px), 1000px);
-  border: 1px solid var(--line); background: color-mix(in oklab, var(--ink) 4%, var(--paper));
-}
-.stage-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-@media (max-width: 1011px) { .stage-frame { max-height: 70svh; } }
-.stage-caption { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 44px; }
-.stage-nav { display: flex; align-items: center; gap: 8px; }
-.stage-nav .muted { margin-right: 8px; }
-.strip-btn {
-  width: 44px; height: 44px; border: 1px solid var(--line); background: none; color: inherit;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.thumb-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
-.thumb { position: relative; flex: none; width: 88px; padding: 0; aspect-ratio: 1; border: 1px solid var(--line); background: none; cursor: pointer; overflow: hidden; }
-.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.thumb[aria-pressed='true'] { outline: 2px solid var(--accent); outline-offset: -2px; }
-.thumb-label { position: absolute; left: 0; bottom: 0; padding: 2px 5px; font-size: 11px; background: var(--paper); color: var(--ink); }
-
-.titleblock { border: 1px solid var(--line); font-size: 14px; }
-.titleblock-head { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
-.titleblock-head h1 { margin: 0; font-size: 32px; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
-.titleblock-rows { margin: 0; }
-.titleblock-rows > div { display: grid; grid-template-columns: 88px 1fr; border-top: 1px solid var(--line); }
-.titleblock-rows dt { padding: 10px 16px; border-right: 1px solid var(--line); }
-.titleblock-rows dd { margin: 0; padding: 10px 16px; }
-.titleblock-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
-.titleblock-links a { display: inline-flex; align-items: center; gap: 2px; }
-.project-lede { margin: 0; font-size: 18px; line-height: 1.45; font-weight: 500; }
-.project-body { font-size: 15px; line-height: 1.6; }
-.project-body > * { margin: 0 0 1em; }
-.project-body > :last-child { margin-bottom: 0; }
-
-/* Long-form text pages: privacy notices, contact. */
-.doc { padding: 0 0 64px; display: flex; flex-direction: column; gap: 8px; }
-.doc-back { padding: 24px 0 16px; text-decoration: none; align-self: flex-start; }
-.doc-back:hover { color: var(--ink); }
-.prose { max-width: 68ch; font-size: 16px; line-height: 1.6; }
-.prose h1 { margin: 24px 0 16px; font-size: clamp(32px, 6vw, 48px); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
-.prose h2 { margin: 32px 0 8px; font-size: 20px; font-weight: 700; }
-.prose h3 { margin: 24px 0 8px; font-size: 16px; font-weight: 700; }
-.prose p, .prose ul, .prose ol { margin: 0 0 1em; }
-.prose ul, .prose ol { padding-left: 1.25em; }
-.contact-address { font-style: normal; }
-
-.page { padding: 64px 0; }
-.page h2 { font-size: 2rem; margin: 0 0 16px; }
-
-.footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
-
-/* CV (/cv). Sections open with a rule carrying their label (like a drawing
-   sheet's zone header). Experience is grouped per organisation: company on
-   the left, a vertical dimension line with a tick at each role. Short
-   sections are grids of thin-framed boxes (title-block fields). */
-.print-only { display: none; }
-.cv { padding: 0 0 64px; }
-.cv-head {
-  display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: flex-end; justify-content: space-between;
-  padding: 56px 0 40px;
-}
-.cv-head-text { display: flex; flex-direction: column; gap: 10px; }
-.cv-head h1 { margin: 0; font-size: clamp(36px, 6vw, 72px); line-height: 1; font-weight: 800; letter-spacing: -0.03em; }
-.cv-headline { margin: 0; font-size: 20px; line-height: 1.4; font-weight: 500; }
-.cv-print { color: inherit; background: none; border: 1px solid var(--line); padding: 12px 16px; min-height: 44px; cursor: pointer; }
-.cv-print:hover { background: var(--ink); color: var(--paper); }
-
-.cv-section { margin-top: 8px; padding-bottom: 32px; }
-.cv-sec-head {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
-  border-top: 2px solid var(--line); padding: 10px 0 20px; font-size: 12px;
-}
-.cv-sec-head h2 { margin: 0; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
-
-/* Experience: [company rail | dimension chain of roles] */
-.cv-org { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 32px; }
-.cv-org + .cv-org { margin-top: 28px; }
-.cv-org-rail { display: flex; flex-direction: column; gap: 4px; padding-top: 2px; font-size: 14px; }
-.cv-org-rail h3 { margin: 0; font-size: 18px; font-weight: 700; }
-.cv-org-rail .mono { margin-top: 4px; }
-.cv-chain { position: relative; border-left: 1px solid var(--line); }
-/* The end tick at the bottom of the chain. */
-.cv-chain::after { content: ''; position: absolute; left: -6px; bottom: 0; width: 11px; border-top: 1px solid var(--line); }
-.cv-role { position: relative; padding: 0 0 24px 24px; display: flex; flex-direction: column; gap: 4px; }
-.cv-role:last-child { padding-bottom: 8px; }
-/* Tick where each role starts on the dimension line. */
-.cv-role::before { content: ''; position: absolute; left: -6px; top: 8px; width: 11px; border-top: 1px solid var(--line); }
-.cv-role-when { line-height: 16px; }
-.cv-role h4 { margin: 0; font-size: 17px; font-weight: 700; }
-.cv-group { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
-.cv-group h5 { margin: 0; font-size: 14px; font-weight: 700; }
-.cv-points { margin: 6px 0 0; padding-left: 1.1em; font-size: 15px; line-height: 1.55; display: flex; flex-direction: column; gap: 4px; }
-.cv-group .cv-points { margin-top: 0; }
-
-/* Boxes: grid where neighbouring frames share their 1px lines. */
-.cv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.cv-grid-1 { grid-template-columns: minmax(0, 1fr); }
-.cv-grid-skills { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
-.cv-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 0; }
-.cv-box-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; flex-wrap: wrap; font-size: 12px; }
-.cv-box h3 { margin: 0; font-size: 17px; font-weight: 700; }
-.cv-link { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; color: var(--muted); }
-.cv-link:hover { color: var(--ink); }
-.cv-desc, .cv-profile { margin: 0; font-size: 15px; line-height: 1.55; }
-.cv-profile { max-width: 72ch; }
-
-@media (max-width: 700px) {
-  .cv-org { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-}
-
-/* Printing (laid out for /cv): A4, black on white, no site chrome. */
-@media print {
-  @page {
-    size: A4;
-    margin: 14mm 15mm 16mm;
-    @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt 'JetBrains Mono', monospace; }
+/* ─── base ────────────────────────────────────────────────────────────── */
+@layer base {
+  * { box-sizing: border-box; }
+  :root {
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: var(--paper);
   }
-  :root { --paper: #ffffff; --ink: #000000; --muted: #3a3a3a; --line: #000000; color-scheme: light; }
-  body { background: #ffffff; }
-  .header, .footer, .cv-print { display: none !important; }
-  .print-only { display: inline; }
-  .shell { max-width: none; padding: 0; min-height: 0; }
-  a { text-decoration: none; }
+  body { margin: 0; background: var(--paper); }
+  a { color: inherit; }
 
-  .cv { padding: 0; font-size: 9.5pt; }
-  .cv-head { padding: 0 0 8pt; gap: 4pt; }
-  .cv-head-text { gap: 3pt; }
-  .cv-head h1 { font-size: 22pt; }
-  .cv-headline { font-size: 11pt; }
-  .cv .mono, .cv-sec-head, .cv-sec-head h2, .cv-box-top { font-size: 7.5pt; }
-  .cv-section { margin-top: 4pt; padding-bottom: 10pt; }
-  .cv-sec-head { border-top-width: 1.5pt; padding: 4pt 0 8pt; }
-  .cv-org { grid-template-columns: 36mm minmax(0, 1fr); gap: 0 12pt; }
-  .cv-org + .cv-org { margin-top: 10pt; }
-  .cv-org-rail { font-size: 8.5pt; gap: 2pt; }
-  .cv-org-rail h3 { font-size: 10.5pt; }
-  .cv-role { padding: 0 0 9pt 12pt; gap: 1.5pt; }
-  .cv-role::before { top: 4pt; }
-  .cv-role h4 { font-size: 10.5pt; }
-  .cv-group { margin-top: 4pt; gap: 1pt; }
-  .cv-group h5 { font-size: 9pt; }
-  .cv-points { font-size: 9pt; gap: 1.5pt; margin-top: 2pt; line-height: 1.4; }
-  .cv-grid, .cv-grid-skills { grid-template-columns: 1fr 1fr; }
-  /* A grid split across pages gets its frame closed/reopened at the break. */
-  .cv-grid { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .mono { font-family: var(--font-mono); font-size: var(--text-label); font-weight: 400; }
+  .muted { color: var(--muted); }
+  .print-only { display: none; }
+}
+
+/* ─── layout ──────────────────────────────────────────────────────────── */
+@layer layout {
+  .shell {
+    min-height: 100vh; display: flex; flex-direction: column;
+    max-width: var(--page-max); margin: 0 auto; padding: 0 var(--gutter);
+    @media (max-width: 600px) { padding: 0 16px; }
+  }
+
+  .header {
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
+    padding: 28px 0; border-bottom: var(--hairline);
+  }
+  .brand { font-size: 20px; line-height: 1; color: var(--ink); }
+  .nav {
+    display: flex; gap: 28px; align-items: center; font-size: var(--text-sm); font-weight: 500;
+    & a {
+      text-decoration: none; color: var(--muted); display: inline-flex; align-items: center; gap: 2px;
+      &:hover, &.active { color: var(--ink); }
+    }
+  }
+
+  .main { flex: 1; display: flex; flex-direction: column; }
+
+  .footer {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    padding: 24px 0; border-top: var(--hairline); color: var(--muted); font-size: var(--text-footer);
+  }
+
+  .page {
+    padding: 64px 0;
+    & h2 { font-size: 2rem; margin: 0 0 16px; }
+  }
+}
+
+/* ─── components ──────────────────────────────────────────────────────── */
+@layer components {
+  /* Wordmark: sized in em from the font geometry (values passed in as
+     --wm-* by Wordmark.tsx), so it scales with font-size like text. */
+  .wordmark {
+    width: var(--wm-width); height: var(--wm-height);
+    display: inline-block; vertical-align: calc(-1 * var(--wm-descent));
+    overflow: visible;
+    &.wordmark--block { display: block; vertical-align: baseline; }
+  }
+
+  /* Hero: the wordmark as a technical figure. Top padding leaves room for the leader label. */
+  .hero { padding: 150px 0 72px; }
+  .hero-title { margin: 0; font-size: clamp(56px, 18vw, 210px); line-height: 1; }
+
+  .spec { position: relative; display: inline-block; color: var(--ink); }
+  .spec-guide {
+    position: absolute; left: -3%; right: -3%; top: var(--y);
+    border-top: 1px dashed var(--line-guide);
+    @media (max-width: 600px) { left: 0; right: 0; }
+  }
+  .spec-label, .spec-fig {
+    position: absolute; white-space: nowrap;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 400; line-height: 1;
+  }
+  .spec-label {
+    right: 0;
+    @media (max-width: 600px) { display: none; }
+  }
+  .spec-label--above { bottom: 4px; }
+  .spec-label--below { top: 4px; }
+  .spec-fig { left: var(--x); top: var(--y); font-size: var(--text-label); transform: translate(8px, -50%); }
+  .spec-fig-long { @media (max-width: 600px) { display: none; } }
+
+  /* Below the hero: quote + motto on the left, numbered works on the right.
+     The two columns stop fitting side by side below ~900px: stack them. */
+  .works { display: flex; flex-wrap: wrap; border-top: var(--hairline); }
+  .works-intro {
+    flex: 1 1 320px; padding: 24px 40px 40px 0; display: flex; flex-direction: column; gap: 14px;
+    @media (max-width: 900px) { padding-right: 0; }
+  }
+  .quote {
+    margin: 0 0 12px; display: flex; flex-direction: column; gap: 10px;
+    & blockquote { margin: 0; font-size: var(--text-xl); line-height: 1.45; font-weight: 500; }
+  }
+  .motto { margin: 0; font-size: var(--text-md); line-height: 1.6; font-weight: 500; }
+  .works-list {
+    flex: 2 1 480px; min-width: 0; margin: 0; padding: 0; list-style: none; border-left: var(--hairline);
+    & li { border-bottom: var(--hairline); }
+    & li:last-child { border-bottom: 0; }
+    @media (max-width: 900px) { border-left: 0; border-top: var(--hairline); }
+  }
+  .works-row {
+    display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
+    padding: 20px 0 20px 32px; color: inherit; text-decoration: none;
+    &:hover .works-name { text-decoration: underline; }
+    @media (max-width: 900px) { padding-left: 0; }
+  }
+  .works-fig { width: 56px; }
+  .works-name { flex: 1 1 160px; font-size: var(--text-xl); font-weight: 700; }
+  .works-desc { flex: 2 1 200px; font-size: var(--text-body); color: var(--muted); }
+
+  /* Project page: gallery left, title block right; fills the screen height.
+     Once the columns stack (560 + 340 + 32 gap + 2×40 padding = 1012px), the
+     stacked rows don't stretch to fill the screen; the fill is a desktop thing. */
+  .project { flex: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
+  .project-back {
+    padding: 24px 0; text-decoration: none; align-self: flex-start;
+    &:hover { color: var(--ink); }
+  }
+  .project-grid {
+    flex: 1; display: flex; flex-wrap: wrap; gap: 32px; align-items: stretch;
+    @media (max-width: 1011px) { align-content: flex-start; }
+  }
+  .project-media { flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; }
+  .project-aside {
+    flex: 2 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px;
+    /* No images: no gallery column, so keep the title block at a readable width. */
+    &:only-child { max-width: 560px; }
+  }
+  .project-lede { margin: 0; font-size: var(--text-lg); line-height: 1.45; font-weight: 500; }
+  .project-body {
+    font-size: var(--text-body); line-height: 1.6;
+    & > * { margin: 0 0 1em; }
+    & > :last-child { margin-bottom: 0; }
+  }
+
+  /* Gallery: one image at a time; the frame's shape (--stage-ratio, from the
+     tallest image) is set by Gallery.tsx, capped to what fits on screen above
+     the thumbnails (420px ≈ header + back link + caption + thumbnails + footer). */
+  .gallery { display: flex; flex-direction: column; gap: 12px; }
+  .stage { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .stage-frame {
+    position: relative; width: 100%; aspect-ratio: var(--stage-ratio);
+    max-height: clamp(320px, calc(100svh - 420px), 1000px);
+    border: var(--hairline); background: var(--fill-soft);
+    & img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    @media (max-width: 1011px) { max-height: 70svh; }
+  }
+  .stage-caption { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: var(--touch); }
+  .stage-nav {
+    display: flex; align-items: center; gap: 8px;
+    & .muted { margin-right: 8px; }
+  }
+  .strip-btn {
+    width: var(--touch); height: var(--touch); border: var(--hairline); background: none; color: inherit;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .thumb-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
+  .thumb {
+    position: relative; flex: none; width: 88px; padding: 0; aspect-ratio: 1;
+    border: var(--hairline); background: none; cursor: pointer; overflow: hidden;
+    & img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    &[aria-pressed='true'] { outline: 2px solid var(--accent); outline-offset: -2px; }
+  }
+  .thumb-label { position: absolute; left: 0; bottom: 0; padding: 2px 5px; font-size: var(--text-xs); background: var(--paper); color: var(--ink); }
+
+  /* Title block (project details), like the info box on a drawing. */
+  .titleblock { border: var(--hairline); font-size: var(--text-sm); }
+  .titleblock-head {
+    padding: 16px; display: flex; flex-direction: column; gap: 6px;
+    & h1 { margin: 0; font-size: 32px; line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+  }
+  .titleblock-rows {
+    margin: 0;
+    & > div { display: grid; grid-template-columns: 88px 1fr; border-top: var(--hairline); }
+    & dt { padding: 10px 16px; border-right: var(--hairline); }
+    & dd { margin: 0; padding: 10px 16px; }
+  }
+  .titleblock-links {
+    display: flex; flex-wrap: wrap; gap: 4px 16px;
+    & a { display: inline-flex; align-items: center; gap: 2px; }
+  }
+
+  /* Long-form text pages: privacy notices, contact. */
+  .doc { padding: 0 0 64px; display: flex; flex-direction: column; gap: 8px; }
+  .doc-back {
+    padding: 24px 0 16px; text-decoration: none; align-self: flex-start;
+    &:hover { color: var(--ink); }
+  }
+  .prose {
+    max-width: 68ch; font-size: var(--text-md); line-height: 1.6;
+    & h1 { margin: 24px 0 16px; font-size: clamp(32px, 6vw, 48px); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+    & h2 { margin: 32px 0 8px; font-size: var(--text-xl); font-weight: 700; }
+    & h3 { margin: 24px 0 8px; font-size: var(--text-md); font-weight: 700; }
+    & p, & ul, & ol { margin: 0 0 1em; }
+    & ul, & ol { padding-left: 1.25em; }
+  }
+  .contact-address { font-style: normal; }
+
+  /* CV (/cv). Sections open with a rule carrying their label (like a drawing
+     sheet's zone header). Experience is grouped per organisation: company on
+     the left, a vertical dimension line with a tick at each role. Short
+     sections are grids of thin-framed boxes (title-block fields). */
+  .cv { padding: 0 0 64px; }
+  .cv-head {
+    display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: flex-end; justify-content: space-between;
+    padding: 56px 0 40px;
+    & h1 { margin: 0; font-size: clamp(36px, 6vw, 72px); line-height: 1; font-weight: 800; letter-spacing: -0.03em; }
+  }
+  .cv-head-text { display: flex; flex-direction: column; gap: 10px; }
+  .cv-headline { margin: 0; font-size: var(--text-xl); line-height: 1.4; font-weight: 500; }
+  .cv-print {
+    color: inherit; background: none; border: var(--hairline); padding: 12px 16px; min-height: var(--touch); cursor: pointer;
+    &:hover { background: var(--ink); color: var(--paper); }
+  }
+
+  .cv-section { margin-top: 8px; padding-bottom: 32px; }
+  .cv-sec-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    border-top: 2px solid var(--line); padding: 10px 0 20px; font-size: var(--text-label);
+    & h2 { margin: 0; font-size: var(--text-label); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+  }
+
+  /* Experience: [company rail | dimension chain of roles] */
+  .cv-org {
+    display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 32px;
+    & + .cv-org { margin-top: 28px; }
+    @media (max-width: 700px) { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  }
+  .cv-org-rail {
+    display: flex; flex-direction: column; gap: 4px; padding-top: 2px; font-size: var(--text-sm);
+    & h3 { margin: 0; font-size: var(--text-lg); font-weight: 700; }
+    & .mono { margin-top: 4px; }
+  }
+  .cv-chain {
+    position: relative; border-left: var(--hairline);
+    /* End tick at the bottom of the chain. */
+    &::after { content: ''; position: absolute; left: -6px; bottom: 0; width: 11px; border-top: var(--hairline); }
+  }
+  .cv-role {
+    position: relative; padding: 0 0 24px 24px; display: flex; flex-direction: column; gap: 4px;
+    &:last-child { padding-bottom: 8px; }
+    /* Tick where each role starts on the dimension line. */
+    &::before { content: ''; position: absolute; left: -6px; top: 8px; width: 11px; border-top: var(--hairline); }
+    & h4 { margin: 0; font-size: 17px; font-weight: 700; }
+  }
+  .cv-role-when { line-height: 16px; }
+  .cv-group {
+    display: flex; flex-direction: column; gap: 4px; margin-top: 10px;
+    & h5 { margin: 0; font-size: var(--text-sm); font-weight: 700; }
+    & .cv-points { margin-top: 0; }
+  }
+  .cv-points {
+    margin: 6px 0 0; padding-left: 1.1em; font-size: var(--text-body); line-height: 1.55;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+
+  /* Boxes: grid where neighbouring frames share their 1px lines. */
+  .cv-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+    border-top: var(--hairline); border-left: var(--hairline);
+  }
   .cv-grid-1 { grid-template-columns: minmax(0, 1fr); }
-  .cv-box { padding: 6pt 8pt 7pt; gap: 2pt; }
-  .cv-box h3 { font-size: 10pt; }
-  .cv-desc { font-size: 9pt; line-height: 1.4; }
+  .cv-grid-skills { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  .cv-box {
+    display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px; min-width: 0;
+    border-right: var(--hairline); border-bottom: var(--hairline);
+    & h3 { margin: 0; font-size: 17px; font-weight: 700; }
+  }
+  .cv-box-top {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; flex-wrap: wrap;
+    font-size: var(--text-label);
+  }
+  .cv-link {
+    display: inline-flex; align-items: center; gap: 2px; text-decoration: none; color: var(--muted);
+    &:hover { color: var(--ink); }
+  }
+  .cv-desc, .cv-profile { margin: 0; font-size: var(--text-body); line-height: 1.55; }
+  .cv-profile { max-width: 72ch; }
+}
 
-  /* Keep a boxed section's rule with its first row (not experience: that
-     would let the browser push it whole to page 2), a role's title with its
-     first bullet; never split a bullet or a box. */
-  .cv-sec-head:has(+ .cv-grid), .cv-role-when, .cv-role h4, .cv-group h5 { break-after: avoid; }
-  /* (No break-inside on the company rail: Chrome then refuses to split the
-     whole row, pushing the first company to page 2.) */
-  .cv-points li, .cv-box { break-inside: avoid; }
+/* ─── print ───────────────────────────────────────────────────────────── */
+/* Laid out for /cv: A4, black on white, no site chrome. */
+@layer print {
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm 15mm 16mm;
+      /* Literal font: page-margin boxes don't reliably see custom properties. */
+      @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt 'JetBrains Mono', monospace; }
+    }
+    /* Always the light scheme on paper, and pure black on white. */
+    :root { color-scheme: light; --paper: #ffffff; --ink: #000000; --muted: #3a3a3a; }
+    body { background: #ffffff; }
+    .header, .footer, .cv-print { display: none; }
+    .print-only { display: inline; }
+    .shell { max-width: none; padding: 0; min-height: 0; }
+    a { text-decoration: none; }
+
+    .cv { padding: 0; font-size: 9.5pt; }
+    .cv-head {
+      padding: 0 0 8pt; gap: 4pt;
+      & h1 { font-size: 22pt; }
+    }
+    .cv-head-text { gap: 3pt; }
+    .cv-headline { font-size: 11pt; }
+    .cv .mono, .cv-sec-head, .cv-sec-head h2, .cv-box-top { font-size: 7.5pt; }
+    .cv-section { margin-top: 4pt; padding-bottom: 10pt; }
+    .cv-sec-head { border-top-width: 1.5pt; padding: 4pt 0 8pt; }
+    .cv-org {
+      grid-template-columns: 36mm minmax(0, 1fr); gap: 0 12pt;
+      & + .cv-org { margin-top: 10pt; }
+    }
+    .cv-org-rail {
+      font-size: 8.5pt; gap: 2pt;
+      & h3 { font-size: 10.5pt; }
+    }
+    .cv-role {
+      padding: 0 0 9pt 12pt; gap: 1.5pt;
+      &:last-child { padding-bottom: 8px; }
+      &::before { top: 4pt; }
+      & h4 { font-size: 10.5pt; }
+    }
+    .cv-points { font-size: 9pt; gap: 1.5pt; margin-top: 2pt; line-height: 1.4; }
+    .cv-group {
+      margin-top: 4pt; gap: 1pt;
+      & h5 { font-size: 9pt; }
+      /* Restated here: this layer beats the component's own override. */
+      & .cv-points { margin-top: 0; }
+    }
+    .cv-grid, .cv-grid-skills { grid-template-columns: 1fr 1fr; }
+    /* A grid split across pages gets its frame closed/reopened at the break. */
+    .cv-grid { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+    .cv-grid-1 { grid-template-columns: minmax(0, 1fr); }
+    .cv-box {
+      padding: 6pt 8pt 7pt; gap: 2pt;
+      & h3 { font-size: 10pt; }
+    }
+    .cv-desc { font-size: 9pt; line-height: 1.4; }
+
+    /* Keep a boxed section's rule with its first row (not experience: that
+       would let the browser push it whole to page 2), a role's title with its
+       first bullet; never split a bullet or a box. No break-inside on the
+       company rail: Chrome then refuses to split the whole row. */
+    .cv-sec-head:has(+ .cv-grid), .cv-role-when, .cv-role h4, .cv-group h5 { break-after: avoid; }
+    .cv-points li, .cv-box { break-inside: avoid; }
+  }
 }

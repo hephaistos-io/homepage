@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { cssVars as vars } from './css-vars'
 import Wordmark from './Wordmark'
 import { wordmark as w } from './wordmark-data'
 
@@ -21,8 +21,6 @@ const start = { x: w.dot.cx + w.dot.r * Math.SQRT1_2, y: w.dot.cy - w.dot.r * Ma
 const elbow = { x: start.x + 360, y: start.y - 360 }
 const leaderEnd = { x: elbow.x + 520, y: elbow.y }
 const leaderPoints = `${start.x},${start.y} ${elbow.x},${elbow.y} ${leaderEnd.x},${leaderEnd.y}`
-
-const vars = (v: Record<string, string>) => v as CSSProperties
 
 export default function SpecWordmark() {
   return (

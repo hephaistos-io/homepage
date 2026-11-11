@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { ProjectImage } from '../projects/types'
+import { cssVars } from './css-vars'
 
 /**
  * One large image at a time, plus a single scrollable row of thumbnails.
@@ -33,7 +34,7 @@ export default function Gallery({ images, fig }: { images: ProjectImage[]; fig: 
   return (
     <div className="gallery">
       <figure className="stage">
-        <div className="stage-frame" style={{ aspectRatio: String(ratio) }}>
+        <div className="stage-frame" style={cssVars({ '--stage-ratio': ratio })}>
           <img key={shown.file} src={shown.src} width={shown.width} height={shown.height} alt={`fig. ${fig}.${selected + 1}`} />
         </div>
         <figcaption className="mono stage-caption">
