@@ -11,9 +11,14 @@
  *   components  one block per component, states and breakpoints nested inside
  *   print       paper output (laid out for /cv)
  *
- * Breakpoints (native CSS can't name them yet, so they're repeated):
- *   600px  phone       700px  CV rail stacks
- *   900px  home works list stacks      1011px  project columns stack
+ * Responsive rules: viewport media queries only for page-level things
+ * (600px = phone). Components that rearrange when their own space runs out
+ * use container queries against their own width, with the exact width at
+ * which their columns stop fitting.
+ *
+ * Labels that sit on lines (guides, rules, ticks) use text-box-trim, so their
+ * box is exactly cap height to baseline and offsets are measured from the ink.
+ * Browsers without it fall back to the full line box; alignment is near-equal.
  */
 @layer tokens, base, layout, components, print;
 
@@ -47,6 +52,8 @@
     --text-xl: 20px;
 
     --hairline: 1px solid var(--line);
+    /* Trim a text box to cap height..baseline (see header). */
+    --trim-to-ink: trim-both cap alphabetic;
     --touch: 44px;      /* minimum hit target */
     --page-max: 1200px;
     --gutter: 40px;
@@ -63,6 +70,8 @@
   }
   body { margin: 0; background: var(--paper); }
   a { color: inherit; }
+  h1, h2, h3, h4, h5, h6, blockquote { text-wrap: balance; }
+  p, li, dd { text-wrap: pretty; }
 
   .mono { font-family: var(--font-mono); font-size: var(--text-label); font-weight: 400; }
   .muted { color: var(--muted); }
@@ -127,22 +136,23 @@
   .spec-label, .spec-fig {
     position: absolute; white-space: nowrap;
     font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 400; line-height: 1;
+    text-box: var(--trim-to-ink);
   }
   .spec-label {
     right: 0;
     @media (max-width: 600px) { display: none; }
   }
-  .spec-label--above { bottom: 4px; }
-  .spec-label--below { top: 4px; }
+  .spec-label--above { bottom: 5px; }
+  .spec-label--below { top: 5px; }
   .spec-fig { left: var(--x); top: var(--y); font-size: var(--text-label); transform: translate(8px, -50%); }
   .spec-fig-long { @media (max-width: 600px) { display: none; } }
 
   /* Below the hero: quote + motto on the left, numbered works on the right.
-     The two columns stop fitting side by side below ~900px: stack them. */
-  .works { display: flex; flex-wrap: wrap; border-top: var(--hairline); }
+     The columns (320 + 480 basis) stop fitting below 800px: stacked style. */
+  .works { container: works / inline-size; display: flex; flex-wrap: wrap; border-top: var(--hairline); }
   .works-intro {
     flex: 1 1 320px; padding: 24px 40px 40px 0; display: flex; flex-direction: column; gap: 14px;
-    @media (max-width: 900px) { padding-right: 0; }
+    @container works (width < 800px) { padding-right: 0; }
   }
   .quote {
     margin: 0 0 12px; display: flex; flex-direction: column; gap: 10px;
@@ -153,29 +163,29 @@
     flex: 2 1 480px; min-width: 0; margin: 0; padding: 0; list-style: none; border-left: var(--hairline);
     & li { border-bottom: var(--hairline); }
     & li:last-child { border-bottom: 0; }
-    @media (max-width: 900px) { border-left: 0; border-top: var(--hairline); }
+    @container works (width < 800px) { border-left: 0; border-top: var(--hairline); }
   }
   .works-row {
     display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
     padding: 20px 0 20px 32px; color: inherit; text-decoration: none;
     &:hover .works-name { text-decoration: underline; }
-    @media (max-width: 900px) { padding-left: 0; }
+    @container works (width < 800px) { padding-left: 0; }
   }
   .works-fig { width: 56px; }
   .works-name { flex: 1 1 160px; font-size: var(--text-xl); font-weight: 700; }
   .works-desc { flex: 2 1 200px; font-size: var(--text-body); color: var(--muted); }
 
   /* Project page: gallery left, title block right; fills the screen height.
-     Once the columns stack (560 + 340 + 32 gap + 2×40 padding = 1012px), the
-     stacked rows don't stretch to fill the screen; the fill is a desktop thing. */
-  .project { flex: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
+     The columns (560 + 340 + 32 gap) stop fitting below 932px; stacked, the
+     rows don't stretch to fill the screen (the fill is a desktop thing). */
+  .project { container: project / inline-size; flex: 1; display: flex; flex-direction: column; padding-bottom: 40px; }
   .project-back {
     padding: 24px 0; text-decoration: none; align-self: flex-start;
     &:hover { color: var(--ink); }
   }
   .project-grid {
     flex: 1; display: flex; flex-wrap: wrap; gap: 32px; align-items: stretch;
-    @media (max-width: 1011px) { align-content: flex-start; }
+    @container project (width < 932px) { align-content: flex-start; }
   }
   .project-media { flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; }
   .project-aside {
@@ -200,7 +210,7 @@
     max-height: clamp(320px, calc(100svh - 420px), 1000px);
     border: var(--hairline); background: var(--fill-soft);
     & img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-    @media (max-width: 1011px) { max-height: 70svh; }
+    @container project (width < 932px) { max-height: 70svh; }
   }
   .stage-caption { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: var(--touch); }
   .stage-nav {
@@ -257,7 +267,7 @@
      sheet's zone header). Experience is grouped per organisation: company on
      the left, a vertical dimension line with a tick at each role. Short
      sections are grids of thin-framed boxes (title-block fields). */
-  .cv { padding: 0 0 64px; }
+  .cv { container: cv / inline-size; padding: 0 0 64px; }
   .cv-head {
     display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: flex-end; justify-content: space-between;
     padding: 56px 0 40px;
@@ -273,7 +283,8 @@
   .cv-section { margin-top: 8px; padding-bottom: 32px; }
   .cv-sec-head {
     display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
-    border-top: 2px solid var(--line); padding: 10px 0 20px; font-size: var(--text-label);
+    border-top: 2px solid var(--line); padding: 12px 0 22px; font-size: var(--text-label);
+    & h2, & span { text-box: var(--trim-to-ink); }
     & h2 { margin: 0; font-size: var(--text-label); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
   }
 
@@ -281,7 +292,8 @@
   .cv-org {
     display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0 32px;
     & + .cv-org { margin-top: 28px; }
-    @media (max-width: 700px) { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    /* Rail 220 + gap 32 + room for the roles: stack below 620px. */
+    @container cv (width < 620px) { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   }
   .cv-org-rail {
     display: flex; flex-direction: column; gap: 4px; padding-top: 2px; font-size: var(--text-sm);
@@ -294,13 +306,20 @@
     &::after { content: ''; position: absolute; left: -6px; bottom: 0; width: 11px; border-top: var(--hairline); }
   }
   .cv-role {
-    position: relative; padding: 0 0 24px 24px; display: flex; flex-direction: column; gap: 4px;
+    --indent: 24px; /* role text's distance from the dimension line */
+    padding: 0 0 24px var(--indent); display: flex; flex-direction: column; gap: 6px;
     &:last-child { padding-bottom: 8px; }
-    /* Tick where each role starts on the dimension line. */
-    &::before { content: ''; position: absolute; left: -6px; top: 8px; width: 11px; border-top: var(--hairline); }
     & h4 { margin: 0; font-size: 17px; font-weight: 700; }
   }
-  .cv-role-when { line-height: 16px; }
+  /* The role's dates, trimmed to their caps; the tick on the dimension line
+     is drawn from here, so it sits on the middle of the date's capitals. */
+  .cv-role-when {
+    position: relative; text-box: var(--trim-to-ink);
+    &::before {
+      content: ''; position: absolute; left: calc(-1 * var(--indent) - 6px); top: 50%;
+      width: 11px; border-top: var(--hairline);
+    }
+  }
   .cv-group {
     display: flex; flex-direction: column; gap: 4px; margin-top: 10px;
     & h5 { margin: 0; font-size: var(--text-sm); font-weight: 700; }
@@ -372,9 +391,9 @@
       & h3 { font-size: 10.5pt; }
     }
     .cv-role {
-      padding: 0 0 9pt 12pt; gap: 1.5pt;
+      --indent: 12pt;
+      padding: 0 0 9pt var(--indent); gap: 2.5pt;
       &:last-child { padding-bottom: 8px; }
-      &::before { top: 4pt; }
       & h4 { font-size: 10.5pt; }
     }
     .cv-points { font-size: 9pt; gap: 1.5pt; margin-top: 2pt; line-height: 1.4; }
