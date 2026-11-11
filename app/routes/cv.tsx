@@ -124,7 +124,16 @@ export default function CvPage() {
           <div className="cv-grid cv-grid-1">
             {cv.publications.map((p) => (
               <Box key={p.title} tag={p.year} title={p.title}>
-                <p className="cv-desc">{p.href ? <a href={p.href}>{p.venue}</a> : `Published in ${p.venue}`}</p>
+                <p className="cv-desc">
+                  Published in{' '}
+                  {p.href ? (
+                    <a href={p.href} target="_blank" rel="noreferrer">
+                      {p.venue} <ArrowUpRight size={12} />
+                    </a>
+                  ) : (
+                    p.venue
+                  )}
+                </p>
               </Box>
             ))}
           </div>

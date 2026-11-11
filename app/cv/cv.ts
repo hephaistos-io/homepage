@@ -84,7 +84,12 @@ export const cv: Cv = {
   ],
 
   publications: [
-    { title: 'Experimental Evaluation of Quantum Machine Learning Algorithms', venue: 'IEEE Xplore', year: '2022' },
+    {
+      title: 'Experimental Evaluation of Quantum Machine Learning Algorithms',
+      venue: 'IEEE Xplore',
+      year: '2022',
+      href: 'https://doi.org/10.1109/ACCESS.2023.3236409',
+    },
   ],
 
   skills: [
