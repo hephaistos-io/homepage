@@ -12,7 +12,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </NavLink>
         <nav className="nav">
           <NavLink to="/" end>Work</NavLink>
-          <NavLink to="/about">About</NavLink>
+          <NavLink to="/cv">CV</NavLink>
           <a href="https://github.com/hephaistos-io" target="_blank" rel="noreferrer">
             GitHub <ArrowUpRight size={14} />
           </a>
