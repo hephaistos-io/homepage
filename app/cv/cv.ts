@@ -22,6 +22,7 @@ export const cv: Cv = {
           title: 'Leadership & Enablement',
           points: [
             'Part of the company wide center of excellence for software engineering, focused on the future of the SDLC',
+            'Developing AI-SDLC platform for internal teams and customers based on AgentSDK and Temporal',
             'Creation of purpose built Skills and Agents, decreasing time to deployment by 23% in a legacy application migration',
             'Co-Architect & main engineer building internal, agent-native software factory to migrate projects and teams to, using open source & vendor agnostic harness',
             'Coaching of a junior software engineer through a testing pipeline refactor, introducing smart filtering and a dependency tree to reduce average runtime by 28%',
@@ -37,7 +38,7 @@ export const cv: Cv = {
             'Improved documentation reliability by moving technical specs closer to the code, with automated publishing to Confluence via CI/CD',
             'Evaluated offerings of Swiss-based cloud providers for new projects, taking into account staffing constraints, pricing and SLAs, informing vendor selection for upcoming RFPs',
           ],
-        },
+        }
       ],
     },
     {
@@ -109,7 +110,7 @@ export const cv: Cv = {
       name: 'Flagforge',
       role: 'Owner, Developer',
       link: { label: 'flagforge.dev', href: 'https://flagforge.dev' },
-      description: 'SaaS offering precise feature flag control across applications, environments regions and users. Built using Angular, Spring boot, redis, k8s, OpenTofu, scaleway, agentic coding.',
+      description: 'Service offering easy to use mapping functionality across services, for SW-Architects that work in large, distributed enterprise environments.',
     },
     {
       name: 'alexandria',
